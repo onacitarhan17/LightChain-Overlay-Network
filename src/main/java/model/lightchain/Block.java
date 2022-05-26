@@ -1,14 +1,12 @@
 package model.lightchain;
 
-import java.io.Serializable;
-
 import model.codec.EntityType;
 import model.crypto.Signature;
 
 /**
  * Represents a LightChain Block that encapsulates set of ValidatedTransaction(s).
  */
-public class Block extends model.Entity implements Serializable {
+public class Block extends model.Entity {
   /**
    * Reference to the hash value of another block as its parent.
    */
@@ -27,7 +25,7 @@ public class Block extends model.Entity implements Serializable {
   /**
    * Signature of the proposer over the hash of this block.
    */
-  private final Signature signature;
+  private Signature signature;
 
   /**
    * Height of the block.
@@ -74,22 +72,23 @@ public class Block extends model.Entity implements Serializable {
     this.height = height;
   }
 
-  @Override
-  public int hashCode() {
-    return this.id().hashCode();
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof Block))  {
-      return false;
-    }
-    Block that = (Block) o;
-
-    return this.id().equals(that.id());
+  /**
+   * Constructor of the block.
+   *
+   * @param previousBlockId identifier of a finalized block that this block is extending its snapshot.
+   * @param proposer identifier of the node that proposes this block (i.e., miner).
+   * @param height height of the block.
+   * @param transactions set of validated transactions that this block carries.
+   */
+  public Block(Identifier previousBlockId,
+               Identifier proposer,
+               int height,
+               ValidatedTransaction[] transactions) {
+    this.previousBlockId = previousBlockId;
+    this.proposer = proposer;
+    this.transactions = transactions.clone();
+    this.signature = null;
+    this.height = height;
   }
 
   /**
@@ -115,6 +114,10 @@ public class Block extends model.Entity implements Serializable {
 
   public Signature getSignature() {
     return signature;
+  }
+
+  public void setSignature(Signature signature) {
+    this.signature = signature;
   }
 
   public int getHeight() {
